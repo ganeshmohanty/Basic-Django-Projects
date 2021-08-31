@@ -1,0 +1,27 @@
+#logo{
+    margin: 4px 15px;
+    filter: invert(95%);
+    height: 2.5rem;
+    width: 2.5rem;
+}
+
+body{
+    background-color: #ebeff5;
+}
+body{
+    font-family: 'Baloo Bhai 2', cursive;
+  }
+
+#total-orders{
+    background-color: #4cb4c7;
+}
+
+
+#orders-delivered{
+    background-color: #7abecc;
+}
+
+#orders-pending{
+    background-color: #7CD1C0;
+}
+
