@@ -1,0 +1,156 @@
+{% extends 'app/base.html' %}
+{% load static %}
+{% block title %}Product Detail{% endblock title %}
+{% block css %}<style>
+    .product-img{
+        height: 40rem;
+        width: 30rem;
+        border-radius: 1rem;
+    }
+    .rating-form{
+        background-color: white !important;
+    }
+    .checked {
+        color: red;
+    }
+</style>
+{% endblock css %}
+{% block main-content %}
+{% csrf_token %}
+<div class="container my-5">
+ <div class="row">
+  <div class="col-sm-6 text-center align-self-center">
+   <img src="{{product.product_image.url}}" alt="image" class="img-fluid img-thumbnail product-img">
+  </div>
+  <div class="col-sm-5 offset-sm-1">
+      
+   <strong ><h2 style="font-weight: bolder !important;">{{product.title}} 
+
+</h2></strong>
+{% for _ in "x"|rjust:product.rate %}
+<span style="font-size:30px;cursor:pointer;color:red" class="fa fa-star"></span>
+{% endfor %}
+   <hr>
+   <p>Product Description:  <input type="hidden" name="pid" id="pid" value={{product.id}}>
+       <p>
+           {{product.description}}
+       </p> Lorem ipsum dolor sit amet consectetur adipisicing elit. Facere, at. Dignissimos rerum incidunt temporibus laudantium. Rem, eveniet corporis. Itaque delectus quae nesciunt nemo, maiores minus deserunt vel. Vero, nulla quisquam!</p> <br>
+   <h4>Rs. {{product.discounted_price}} <small class="fw-light text-decoration-line-through">Rs.{{product.selling_price}}</small></h4> <br>
+   {% if request.user.is_authenticated %}
+   {% if item_already_in_cart %}
+   <a href={% url 'showcart' %}  class="btn btn-warning shadow px-5 py-2 ms-4">Go to Cart</a>
+   {% else %}
+   <form action="/add-to-cart" class="d-inline">
+    <input type="hidden" name="prod_id" value="{{product.id}}" id="prod_id">
+    <button type="submit" class="btn btn-primary shadow px-5 py-2">Add to Cart</button>
+</form>
+{% endif %}
+{% endif %}
+{% if not request.user.is_authenticated %}
+<form action="/add-to-cart" class="d-inline">
+    <input type="hidden" name="prod_id" value="{{product.id}}" id="prod_id">
+    <button type="submit" class="btn btn-primary shadow px-5 py-2">Add to Cart</button>
+</form>
+{% endif %}
+   <a href="{% url 'checkout' product.id %}" class="btn btn-danger shadow px-5 py-2 ms-4">Buy Now</a>
+   <h5 class="mt-5">Available Offers</h5>
+   <ul>
+    <li>Bank Offer 5% Unlimited Cashback on Flipkart Axis Bank Credit</li>
+    <li>Special Price Get extra ₹3000 off (price inclusive of discount)</li>
+    <li>No cost EMI ₹1,667/month. Standard EMI also available</li>
+    <li>Partner Offer ₹2000 Flipkart Gift Card on Every 1000th Transaction with a new Visa Debit/Credit Card</li>
+   </ul>
+  </div>
+ </div>
+</div>
+<div class="container">
+    <div class="list-group" id="list-review">
+        {% for review in reviews %}
+        <div class='list-group-item list-group-item-action ' aria-current='true'><div class='d-flex w-100 justify-content-between'><h5 class='mb-1'><strong>{{review.user}}</strong></h5><small>{{review.date_reviewed}}</small></div><p class='mb-1'>{{review.review}}</p><small><strong>Rated as:&nbsp;"{{review.star}}"&nbsp;star</strong></small></div>
+        {% endfor %}
+    </div>
+      {% if request.user.is_authenticated %}
+    <div class="mb-3">
+        <div id="msg" class="alert alert-danger" style="display: none;"></div>
+        <label for="exampleFormControlTextarea1" class="form-label">Write a Review:</label>
+        <textarea  class="form-control rating-form" id="exampleFormControlTextarea1" rows="3"></textarea>
+      </div>
+      <div class="stars">
+        <span  onmouseover="starmark(this)" onclick="starmark(this)" id="1one" style="font-size:40px;cursor:pointer;"  class="fa fa-star checked"></span>
+        <span onmouseover="starmark(this)" onclick="starmark(this)" id="2one"  style="font-size:40px;cursor:pointer;" class="fa fa-star "></span>
+        <span onmouseover="starmark(this)" onclick="starmark(this)" id="3one"  style="font-size:40px;cursor:pointer;" class="fa fa-star "></span>
+        <span onmouseover="starmark(this)" onclick="starmark(this)" id="4one"  style="font-size:40px;cursor:pointer;" class="fa fa-star"></span>
+        <span onmouseover="starmark(this)" onclick="starmark(this)" id="5one"  style="font-size:40px;cursor:pointer;" class="fa fa-star"></span>
+      </div>
+      <div class="col-12">
+        <button id ="btnsave" type="submit" class="btn btn-primary">Save</button>
+      </div>
+      {% else %}
+      <div id="msg" class="alert alert-danger" ><p class="text-center">Login To Review</p></div>
+      {% endif %}
+</div>
+{% endblock main-content %}
+{% block jquery %} 
+<script>
+// get all the stars
+var count;
+
+function starmark(item){
+    count=item.id[0];
+    
+    
+    var subid= item.id.substring(1);
+    for(var i=0;i<5;i++){
+        if(i<count){
+            document.getElementById((i+1)+subid).style.color="red";
+                }else{
+            document.getElementById((i+1)+subid).style.color="black";
+                }
+            }
+    }
+
+
+
+ $('#btnsave').click(function(e){
+    e.preventDefault()
+    
+    let review = $('#exampleFormControlTextarea1').val();
+    let pid = `{{product.id}}`
+    let csrf =$('input[name=csrfmiddlewaretoken').val()
+    console.log(review)
+    console.log(pid)
+    console.log(csrf)
+    console.log(count)
+    output=''
+    let data={pid:pid,review:review,csrfmiddlewaretoken:csrf,star:count}
+        $.ajax({
+            url:"{% url 'review' %}",
+            method:'POST',
+            data:data,
+            success: function(data){
+                console.log(data)
+                x=data.reviews
+                if (data.status=='save'){
+                for(i=0;i<x.length;i++){
+                    output += "<div class='list-group-item list-group-item-action ' aria-current='true'><div class='d-flex w-100 justify-content-between'><h5 class='mb-1'><strong>"+ x[i].user__username +"<strong></h5><small>"+x[i].date_reviewed+"</small></div><p class='mb-1'>"+ x[i].review +"</p><small><strong>Rated as:&nbsp;" +x[i].star +"&nbsp;star</strong></small></div>"
+                }
+                console.log(output)
+                $('#list-review').html(output);
+                $('#exampleFormControlTextarea1').val('')
+            }
+                if( data.status == 'exists' ){
+                    console.log('exists')
+                    $('#exampleFormControlTextarea1').val('')
+                    $("#msg").text("Your Review Already Exists..!!!You can't Review Again.")
+                    $('#msg').show()
+                    $('#msg').fadeOut(10000)
+                }
+                if(data.status == 'no'){
+                    alert('Anauhtorized')
+                }
+            } 
+        })
+})
+</script>
+
+{% endblock jquery %}

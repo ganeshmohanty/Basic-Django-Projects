@@ -1,0 +1,22 @@
+{% extends 'app/base.html' %}
+{% load static %}
+{% block title %}Empty Cart{% endblock title %}
+{% block css %}
+<style>
+.img-empty{
+    border-radius: 1rem;
+    border-color: transparent;
+}
+</style>
+ {% endblock css %}
+{% block main-content %}
+<div class="container">
+ <div class="row my-3">
+  <div class="col-sm-6 offset-sm-3">
+   <h3 class='text-center'>Sorry! Your Cart is Empty</h3>
+   <div class="text-center">
+   <img src="{% static 'app/images/emptycart.png' %}" class="img-empty img-fluid img-thumbnail w-75 h-75"></div>
+  </div>
+ </div>
+</div>
+{% endblock main-content %}

@@ -1,0 +1,46 @@
+{% extends 'app/base.html' %}
+{% load static %}
+{% block title %}Buy Now{% endblock title %}
+{% block css %}
+<style>
+  .img-hover{
+    border-radius: 1rem;
+    transition: width 2s, height 1.3s, box-shadow 1s ease-out;
+    height: 20rem;
+  }
+  .img-hover:hover{
+    box-shadow:13px 12px 30px 13px  rgb(212, 212, 212); 
+    height: 22rem;
+    
+  }
+</style> {% endblock css%}
+{% block main-content %}
+<div class="container my-5">
+    <div class="row">
+        
+        <div class="col-sm-11 ">
+            <div class='row'>
+                {% for product in products %}
+                <div class="col-sm-4 text-center mb-4">
+                    <a href="{% url 'product-detail' product.id%}" class="btn">
+                        <div class="item">
+                            <img class="img-hover" src="{{product.product_image.url}}" alt="image" class="img-hover" height="200px">
+                            <div class="fw-bold">{{product.title}}</div>
+                            {% for _ in "x"|rjust:product.rate %}
+    <span style="font-size:1rem;cursor:pointer;color:red" class="fa fa-star"></span>
+    {% endfor %}
+                            <div class="fw-bold">Rs.{{product.discounted_price}}
+                                <small class="fw-light text-decoration-line-through">{{product.selling_price}}</small>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% empty %}
+                <div class="col-sm-4 text-center mb-4">
+                <h2>No Search Results</h2></div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock main-content %}
